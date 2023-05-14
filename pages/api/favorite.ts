@@ -1,9 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
-
-import prismadb from "@/libs/prismadb";
-
 import { without } from "lodash";
 
+import prismadb from "@/libs/prismadb";
 import serverAuth from "@/libs/serverAuth";
 
 export default async function handler(
@@ -12,7 +10,7 @@ export default async function handler(
 ) {
   try {
     if (req.method === "POST") {
-      const { currentUser } = await serverAuth(req);
+      const { currentUser } = await serverAuth(req, res);
 
       const { movieId } = req.body;
 
@@ -40,8 +38,9 @@ export default async function handler(
     }
 
     if (req.method === "DELETE") {
-      const { currentUser } = await serverAuth(req);
+      const { currentUser } = await serverAuth(req, res);
 
+      console.log("req.body", req.body);
       const { movieId } = req.body;
 
       const existingMovie = await prismadb.movie.findUnique({
@@ -70,6 +69,7 @@ export default async function handler(
 
     return res.status(405).end();
   } catch (error) {
-    console.log("error", error);
+    console.log(error);
+    return res.status(500).end();
   }
 }
